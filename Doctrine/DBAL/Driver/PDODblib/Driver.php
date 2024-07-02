@@ -21,6 +21,9 @@
 
 namespace Lsw\DoctrinePdoDblib\Doctrine\DBAL\Driver\PDODblib;
 
+use Doctrine\DBAL\Driver\API\ExceptionConverter;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+
 /**
  * The PDO-based Dblib driver.
  *
@@ -82,16 +85,21 @@ class Driver implements \Doctrine\DBAL\Driver {
         }
     }
 
-    public function getSchemaManager(\Doctrine\DBAL\Connection $conn) {
+    public function getSchemaManager(\Doctrine\DBAL\Connection $conn, AbstractPlatform $platform) {
         if (class_exists('\\Doctrine\\DBAL\\Schema\\SQLServerSchemaManager')) {
-            return new \Doctrine\DBAL\Schema\SQLServerSchemaManager($conn);
+            return new \Doctrine\DBAL\Schema\SQLServerSchemaManager($conn, $platform);
         }
 
         if (class_exists('\\Doctrine\\DBAL\\Schema\\MsSqlSchemaManager')) {
-            return new \PDODblibBundle\Doctrine\DBAL\Schema\PDODblibSchemaManager($conn);
+            return new \PDODblibBundle\Doctrine\DBAL\Schema\PDODblibSchemaManager($conn, $platform);
         }
 
 
+    }
+
+    public function getExceptionConverter(): ExceptionConverter
+    {
+        return new \Doctrine\DBAL\Driver\API\SQLSrv\ExceptionConverter();
     }
 
     public function getName() {
